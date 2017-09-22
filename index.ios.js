@@ -11,6 +11,8 @@ import {
   Text,
   View
 } from 'react-native';
+import Camera from 'react-native-camera';
+import Tts from 'react-native-tts';
 
 export default class fireball extends Component {
   render() {
@@ -21,7 +23,6 @@ export default class fireball extends Component {
         </Text>
         <Text style={styles.instructions}>
           To get started, edit index.ios.js
-          Hi Sara!!!
         </Text>
         <Text style={styles.instructions}>
           Press Cmd+R to reload,{'\n'}
