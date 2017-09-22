@@ -14,6 +14,7 @@ import {
   Image
 } from 'react-native';
 import Camera from 'react-native-camera';
+import Axios from 'axios'
 // import Tts from 'react-native-tts';
 // import { Examples } from '@shoutem/ui';
 
@@ -22,10 +23,11 @@ export default class fireball extends Component {
     super(props);
     this.state = {
       path: null,
+      picString: ''
     };
     this.takePicture.bind(this)
   }
-  
+
   takePicture() {
     this.camera.capture()
       .then((data) => {
@@ -69,6 +71,36 @@ export default class fireball extends Component {
     );
   }
 
+  convertPictureToString(){
+    NativeModules.RNImageToBase64.getBase64String(uri)
+    .then((base64) => {
+      this.setState({picString: base64})
+      detectTheThing()
+  })}
+
+  detectTheThing(){
+    const content = this.state.picString;
+    return Axios.post('https://vision.googleapis.com/v1/images:annotate', {
+      "requests":[
+        {
+          "image":{
+            "content":{content}
+          },
+          "features":[
+            {
+              "type":"LABEL_DETECTION",
+              "maxResults":1
+            }
+          ]
+        }
+      ]
+    })
+      .then(res => {
+        // DO SOMETHING WITH RESPONSE
+
+      })
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -76,7 +108,7 @@ export default class fireball extends Component {
       </View>
     )
   }
-  
+
 }
 
 const styles = StyleSheet.create({

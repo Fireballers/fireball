@@ -3,6 +3,7 @@ package com.fireball;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.github.xfumihiro.react_native_image_to_base64.ImageToBase64Package;
 import com.reactnative.photoview.PhotoViewPackage;
 import cl.json.RNSharePackage;
 import com.BV.LinearGradient.LinearGradientPackage;
@@ -29,6 +30,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ImageToBase64Package(),
             new PhotoViewPackage(),
             new RNSharePackage(),
             new LinearGradientPackage(),
