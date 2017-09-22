@@ -9,27 +9,74 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  Dimensions,
+  View,
+  Image
 } from 'react-native';
+import Camera from 'react-native-camera';
+// import Tts from 'react-native-tts';
+// import { Examples } from '@shoutem/ui';
 
 export default class fireball extends Component {
-  render() {
+  constructor(props) {
+    super(props);
+    this.state = {
+      path: null,
+    };
+    this.takePicture.bind(this)
+  }
+  
+  takePicture() {
+    this.camera.capture()
+      .then((data) => {
+        console.log(data)
+        this.setState({ path: data.path })
+      })
+      .catch(err => console.error(err));
+  }
+
+  renderCamera() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-          Hi Sara!!!
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
+        <Camera
+          ref={(cam) => {
+            this.camera = cam;
+          }}
+          style={styles.preview}
+          aspect={Camera.constants.Aspect.fill}
+          captureTarget={Camera.constants.CaptureTarget.disk}
+          >
+          <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
+        </Camera>
+
+      </View>
+    );
+  }
+
+  renderImage() {
+    return (
+      <View>
+        <Image
+          source={{ uri: this.state.path }}
+          style={styles.preview}
+        />
+        <Text
+          style={styles.cancel}
+          onPress={() => this.setState({ path: null })}
+        >Cancel
         </Text>
       </View>
     );
   }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        {this.state.path ? this.renderImage() : this.renderCamera()}
+      </View>
+    )
+  }
+  
 }
 
 const styles = StyleSheet.create({
@@ -39,16 +86,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  preview: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    height: (Dimensions.get('window').height)/2,
+    width: Dimensions.get('window').width
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  capture: {
+    flex: 0,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    color: '#000',
+    padding: 10,
+    margin: 40
+  }
 });
 
 AppRegistry.registerComponent('fireball', () => fireball);
