@@ -3,7 +3,7 @@
  * https://github.com/facebook/react-native
  * @flow
  */
-
+import { cloudVision } from './secrets';
 import React, { Component } from 'react';
 import {
   AppRegistry,
@@ -11,10 +11,13 @@ import {
   Text,
   Dimensions,
   View,
-  Image
+  Image,
+  NativeModules
 } from 'react-native';
 import Camera from 'react-native-camera';
 import Axios from 'axios'
+import RNFS from 'react-native-fs'
+
 // import Tts from 'react-native-tts';
 // import { Examples } from '@shoutem/ui';
 
@@ -26,6 +29,8 @@ export default class fireball extends Component {
       picString: ''
     };
     this.takePicture.bind(this)
+    this.convertPictureToString.bind(this)
+    this.detectTheThing.bind(this)
   }
 
   takePicture() {
@@ -33,7 +38,9 @@ export default class fireball extends Component {
       .then((data) => {
         console.log(data)
         this.setState({ path: data.path })
+        return this.convertPictureToString(this.state.path);
       })
+      .then((base64Photo) => this.detectTheThing(base64Photo))
       .catch(err => console.error(err));
   }
 
@@ -71,20 +78,23 @@ export default class fireball extends Component {
     );
   }
 
-  convertPictureToString(){
-    NativeModules.RNImageToBase64.getBase64String(uri)
-    .then((base64) => {
-      this.setState({picString: base64})
-      detectTheThing()
-  })}
 
-  detectTheThing(){
-    const content = this.state.picString;
-    return Axios.post('https://vision.googleapis.com/v1/images:annotate', {
+
+
+  convertPictureToString(uri){
+    console.log('does it even run convertpictostring?')
+    return RNFS.readFile( uri, 'base64' )
+    .then(res => res)
+    .catch(err => console.error(err))
+  }
+
+  detectTheThing(base64Photo){
+    console.log('detect the thing', base64Photo)
+    return Axios.post(cloudVision, {
       "requests":[
         {
           "image":{
-            "content":{content}
+            "content": base64Photo
           },
           "features":[
             {
@@ -97,8 +107,9 @@ export default class fireball extends Component {
     })
       .then(res => {
         // DO SOMETHING WITH RESPONSE
-
+        console.log('res: ', res)
       })
+      .catch((err) => console.error('it\'s me! Not something else!', err))
   }
 
   render() {
