@@ -13,11 +13,13 @@ import {
 } from 'react-native';
 import Camera from 'react-native-camera';
 import Tts from 'react-native-tts';
+import { Examples } from '@shoutem/ui';
 
 export default class fireball extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Examples />
         <Text style={styles.welcome}>
           Welcome to React Native!
         </Text>
