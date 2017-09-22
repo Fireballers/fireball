@@ -10,14 +10,32 @@ import {
   StyleSheet,
   Text,
   Dimensions,
-  View
+  View,
+  Image
 } from 'react-native';
 import Camera from 'react-native-camera';
 // import Tts from 'react-native-tts';
 // import { Examples } from '@shoutem/ui';
 
 export default class fireball extends Component {
-  render() {
+  constructor(props) {
+    super(props);
+    this.state = {
+      path: null,
+    };
+    this.takePicture.bind(this)
+  }
+  
+  takePicture() {
+    this.camera.capture()
+      .then((data) => {
+        console.log(data)
+        this.setState({ path: data.path })
+      })
+      .catch(err => console.error(err));
+  }
+
+  renderCamera() {
     return (
       <View style={styles.container}>
         <Camera
@@ -25,19 +43,40 @@ export default class fireball extends Component {
             this.camera = cam;
           }}
           style={styles.preview}
-          aspect={Camera.constants.Aspect.fill}>
-          <Text style={styles.capture} onPress={console.log("hi")}>[CAPTURE]</Text>
+          aspect={Camera.constants.Aspect.fill}
+          captureTarget={Camera.constants.CaptureTarget.disk}
+          >
+          <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
         </Camera>
-        <Text>Hi!</Text>
+
       </View>
     );
   }
 
-  takePicture() {
-    this.camera.capture()
-      .then((data) => console.log(data))
-      .catch(err => console.error(err));
+  renderImage() {
+    return (
+      <View>
+        <Image
+          source={{ uri: this.state.path }}
+          style={styles.preview}
+        />
+        <Text
+          style={styles.cancel}
+          onPress={() => this.setState({ path: null })}
+        >Cancel
+        </Text>
+      </View>
+    );
   }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        {this.state.path ? this.renderImage() : this.renderCamera()}
+      </View>
+    )
+  }
+  
 }
 
 const styles = StyleSheet.create({
@@ -51,7 +90,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    height: Dimensions.get('window').height,
+    height: (Dimensions.get('window').height)/2,
     width: Dimensions.get('window').width
   },
   capture: {
