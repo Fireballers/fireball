@@ -20,16 +20,24 @@ export default class fireball extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Camera
+          ref={(cam) => {
+            this.camera = cam;
+          }}
+          style={styles.preview}
+          aspect={Camera.constants.Aspect.fill}>
+          <Text style={styles.capture} onPress={console.log("hi")}>[CAPTURE]</Text>
+        </Camera>
         <Text>Hi!</Text>
       </View>
     );
   }
 
-//   takePicture() {
-//    this.camera.capture()
-//      .then((data) => console.log(data))
-//      .catch(err => console.error(err));
-//  }
+  takePicture() {
+    this.camera.capture()
+      .then((data) => console.log(data))
+      .catch(err => console.error(err));
+  }
 }
 
 const styles = StyleSheet.create({
@@ -40,12 +48,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   preview: {
-   flex: 1,
-   justifyContent: 'flex-end',
-   alignItems: 'center',
-   height: Dimensions.get('window').height,
-   width: Dimensions.get('window').width
- },
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    height: Dimensions.get('window').height,
+    width: Dimensions.get('window').width
+  },
   capture: {
     flex: 0,
     backgroundColor: '#fff',
