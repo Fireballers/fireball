@@ -9,30 +9,27 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
+  Dimensions,
   View
 } from 'react-native';
 import Camera from 'react-native-camera';
-import Tts from 'react-native-tts';
-import { Examples } from '@shoutem/ui';
+// import Tts from 'react-native-tts';
+// import { Examples } from '@shoutem/ui';
 
 export default class fireball extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Examples />
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
+        <Text>Hi!</Text>
       </View>
     );
   }
+
+//   takePicture() {
+//    this.camera.capture()
+//      .then((data) => console.log(data))
+//      .catch(err => console.error(err));
+//  }
 }
 
 const styles = StyleSheet.create({
@@ -42,16 +39,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+  preview: {
+   flex: 1,
+   justifyContent: 'flex-end',
+   alignItems: 'center',
+   height: Dimensions.get('window').height,
+   width: Dimensions.get('window').width
+ },
+  capture: {
+    flex: 0,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    color: '#000',
+    padding: 10,
+    margin: 40
+  }
 });
 
 AppRegistry.registerComponent('fireball', () => fireball);
