@@ -17,6 +17,7 @@ import {
 import Camera from 'react-native-camera';
 import Axios from 'axios'
 import RNFS from 'react-native-fs'
+import Header from './Header'
 
 // import Tts from 'react-native-tts';
 // import { Examples } from '@shoutem/ui';
@@ -46,18 +47,20 @@ export default class fireball extends Component {
 
   renderCamera() {
     return (
-      <View style={styles.container}>
-        <Camera
-          ref={(cam) => {
-            this.camera = cam;
-          }}
-          style={styles.preview}
-          aspect={Camera.constants.Aspect.fill}
-          captureTarget={Camera.constants.CaptureTarget.disk}
-          >
-          <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
-        </Camera>
-
+      <View>
+        <Header />
+        <View style={styles.container}>
+          <Camera
+            ref={(cam) => {
+              this.camera = cam;
+            }}
+            style={styles.preview}
+            aspect={Camera.constants.Aspect.fill}
+            captureTarget={Camera.constants.CaptureTarget.disk}
+            >
+            <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
+          </Camera>
+        </View>
       </View>
     );
   }
@@ -65,7 +68,8 @@ export default class fireball extends Component {
   renderImage() {
     return (
       <View>
-        <Text style={{margin: 60}} >{this.state.text}</Text>
+        <Header />
+        <Text style={{margin: 60, textAlign: 'center'}} >{this.state.text}</Text>
         <Image
           source={{ uri: this.state.path }}
           style={styles.preview}
