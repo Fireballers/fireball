@@ -3,7 +3,7 @@
  * https://github.com/facebook/react-native
  * @flow
  */
-import { cloudVision } from './secrets';
+import { cloudVision, translateApi, translateLang } from './secrets';
 import React, { Component } from 'react';
 import {
   AppRegistry,
@@ -93,6 +93,7 @@ export default class fireball extends Component {
 
   detectTheThing(base64Photo){
     console.log('detect the thing', base64Photo)
+
     return Axios.post(cloudVision, {
       "requests":[
         {
@@ -112,7 +113,23 @@ export default class fireball extends Component {
         // DO SOMETHING WITH RESPONSE
         console.log('res: ', res)
         this.setState({
-          text: `We're ${res.data.responses[0].labelAnnotations[0].score}% sure that you captured: ${res.data.responses[0].labelAnnotations[0].description}!`
+          score: res.data.responses[0].labelAnnotations[0].score,
+          description: res.data.responses[0].labelAnnotations[0].description,
+          
+        })
+      })
+      .then(() => {
+        return Axios.post(translateApi, {
+          "q": this.state.description,
+          "target": translateLang
+        })
+      })
+      .then(res => res.data)
+      .then(res => {
+        console.log(res.data.translations[0].translatedText)
+        this.setState({
+          translatedText: res.data.translations[0].translatedText,
+          text: `We're ${this.state.score}% sure that you captured: ${this.state.description}!. It's translation is ${res.data.translations[0].translatedText}`
         })
       })
       .catch((err) => console.error('it\'s me! Not something else!', err))
