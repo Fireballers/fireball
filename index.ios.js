@@ -3,7 +3,7 @@
  * https://github.com/facebook/react-native
  * @flow
  */
-import { cloudVision, translateApi, translateLang, selectedLanguage } from './secrets';
+import { cloudVision, translateApi} from './secrets';
 import React, { Component } from 'react';
 import {
   AppRegistry,
@@ -12,7 +12,8 @@ import {
   Dimensions,
   View,
   Image,
-  NativeModules
+  NativeModules,
+  Picker
 } from 'react-native';
 import Camera from 'react-native-camera';
 import Axios from 'axios'
@@ -27,15 +28,34 @@ export default class fireball extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      changeLang: true,
       path: null,
       text: 'Loading...',
       score: null,
       description: null,
-      translatedText: null
+      translatedText: null,
+      selectedLanguage: 'Indonesian',
+      selectedLangCode: 'id'
     };
     this.takePicture.bind(this)
     this.convertPictureToString.bind(this)
     this.detectTheThing.bind(this)
+
+    this.codes = {
+      English: 'en',
+      French: 'fr',
+      German: 'de',
+      Hebrew: 'iw',
+      Indonesian: 'id',
+      Japanese: 'ja',
+      Korean: 'ko',
+      Polish: 'pl',
+      Russian: 'ru',
+      Spanish: 'es',
+      Swedish: 'sv',
+      Yiddish: 'yi'
+    };
+
   }
 
   takePicture() {
@@ -71,9 +91,9 @@ export default class fireball extends Component {
 
   renderImage() {
     return (
-      <View>
+      <View style={{backgroundColor: '#BBB'}}>
         <Header />
-        <Text style={styles.text} >{this.state.text}</Text>
+        <Text style={styles.text} onPress={() => this.setState({changeLang: true})}>{this.state.text}</Text>
         <Image
           source={{ uri: this.state.path }}
           style={styles.preview}
@@ -92,6 +112,24 @@ export default class fireball extends Component {
     );
   }
 
+  renderPicker(){
+    return (
+      <View style={{backgroundColor: 'black', padding: 100}}>
+        <Header />
+        <Text style={{fontSize: 17, color: '#fcad0f', textAlign: 'center'}}>Select Translation Language</Text>
+        <View style={{backgroundColor: '#b7b1a5', margin: 50}}>
+          <Picker
+            selectedValue={this.state.selectedLanguage}
+            onValueChange={(itemValue) => this.setState({selectedLanguage: itemValue, selectedLangCode: this.codes[itemValue]})}>
+            {Object.keys(this.codes).map((lang, i) => {
+              return <Picker.Item key={i} label={lang} value={lang} />
+            })}
+          </Picker>
+          <Text style={styles.text} onPress={() => this.setState({changeLang: false})}>Take Photo</Text>
+        </View>
+      </View>
+    )
+  }
 
   convertPictureToString(uri){
     console.log('does it even run convertpictostring?')
@@ -119,18 +157,16 @@ export default class fireball extends Component {
       ]
     })
       .then(res => {
-        // DO SOMETHING WITH RESPONSE
         console.log('res: ', res)
         this.setState({
           score: Math.floor(res.data.responses[0].labelAnnotations[0].score * 100),
           description: res.data.responses[0].labelAnnotations[0].description,
-
         })
       })
       .then(() => {
         return Axios.post(translateApi, {
           "q": this.state.description,
-          "target": translateLang
+          "target": this.state.selectedLangCode
         })
       })
       .then(res => res.data)
@@ -138,7 +174,7 @@ export default class fireball extends Component {
         console.log(res.data.translations[0].translatedText)
         this.setState({
           translatedText: res.data.translations[0].translatedText,
-          text: `We're ${this.state.score}% sure that you captured: ${this.state.description}! Its translation to ${selectedLanguage} is ${res.data.translations[0].translatedText}`
+          text: `We're ${this.state.score}% sure that you captured: ${this.state.description}! Its translation to ${this.state.selectedLanguage} is ${res.data.translations[0].translatedText}`
         })
       })
       .then(() => {
@@ -155,7 +191,7 @@ export default class fireball extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {this.state.path ? this.renderImage() : this.renderCamera()}
+        { this.state.path ? this.renderImage() : (this.state.changeLang ? this.renderPicker() : this.renderCamera()) }
       </View>
     )
   }
@@ -165,14 +201,17 @@ export default class fireball extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'black',
   },
   text: {
-    margin: 20,
+    paddingLeft: 80,
+    paddingRight: 80,
     fontSize: 16,
-    textAlign: 'center'
+    textAlign: 'center',
+    backgroundColor: 'rgb(249, 202, 107)'
   },
   preview: {
     flex: 1,
@@ -191,7 +230,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   cancel: {
-      backgroundColor: 'rgba(192, 192, 192, 0.4)',
+      backgroundColor: 'white',
       justifyContent: 'center',
       alignItems: 'center',
       textAlign: 'center',
