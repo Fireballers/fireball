@@ -128,6 +128,7 @@ export default class fireball extends Component {
       .then(res => {
         console.log(res.data.translations[0].translatedText)
         this.setState({
+          translatedText: res.data.translations[0].translatedText,
           text: `We're ${this.state.score}% sure that you captured: ${this.state.description}!. It's translation is ${res.data.translations[0].translatedText}`
         })
       })
