@@ -18,6 +18,7 @@ import Camera from 'react-native-camera';
 import Axios from 'axios'
 import RNFS from 'react-native-fs'
 import Header from './Header'
+import Tts from 'react-native-tts'
 
 // import Tts from 'react-native-tts';
 // import { Examples } from '@shoutem/ui';
@@ -131,6 +132,14 @@ export default class fireball extends Component {
           translatedText: res.data.translations[0].translatedText,
           text: `We're ${this.state.score}% sure that you captured: ${this.state.description}!. It's translation is ${res.data.translations[0].translatedText}`
         })
+      })
+      .then(() => {
+        console.log("speaking")
+        Tts.speak(this.state.translatedText, "com.apple.ttsbundle.Damayanti-compact");
+        return Tts.voices()
+      })
+      .then(voices => {
+        console.log(voices)
       })
       .catch((err) => console.error('it\'s me! Not something else!', err))
   }
