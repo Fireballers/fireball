@@ -3,7 +3,7 @@
  * https://github.com/facebook/react-native
  * @flow
  */
-import { cloudVision, translateApi, translateLang } from './secrets';
+import { cloudVision, translateApi, translateLang, selectedLanguage } from './secrets';
 import React, { Component } from 'react';
 import {
   AppRegistry,
@@ -27,7 +27,10 @@ export default class fireball extends Component {
     super(props);
     this.state = {
       path: null,
-      text: 'Loading...'
+      text: 'Loading...',
+      score: null,
+      description: null,
+      translatedText: null
     };
     this.takePicture.bind(this)
     this.convertPictureToString.bind(this)
@@ -69,16 +72,21 @@ export default class fireball extends Component {
     return (
       <View>
         <Header />
-        <Text style={{margin: 60, textAlign: 'center'}} >{this.state.text}</Text>
+        <Text style={styles.text} >{this.state.text}</Text>
         <Image
           source={{ uri: this.state.path }}
           style={styles.preview}
         />
         <Text
           style={styles.cancel}
-          onPress={() => this.setState({ path: null })}
-        >Cancel
-        </Text>
+          onPress={() => this.setState({
+              path: null,
+              text: 'Loading...',
+              score: null,
+              description: null,
+              translatedText: null
+          })}
+        >Back to Camera</Text>
       </View>
     );
   }
@@ -113,9 +121,9 @@ export default class fireball extends Component {
         // DO SOMETHING WITH RESPONSE
         console.log('res: ', res)
         this.setState({
-          score: res.data.responses[0].labelAnnotations[0].score,
+          score: Math.floor(res.data.responses[0].labelAnnotations[0].score * 100),
           description: res.data.responses[0].labelAnnotations[0].description,
-          
+
         })
       })
       .then(() => {
@@ -129,7 +137,7 @@ export default class fireball extends Component {
         console.log(res.data.translations[0].translatedText)
         this.setState({
           translatedText: res.data.translations[0].translatedText,
-          text: `We're ${this.state.score}% sure that you captured: ${this.state.description}!. It's translation is ${res.data.translations[0].translatedText}`
+          text: `We're ${this.state.score}% sure that you captured: ${this.state.description}! Its translation to ${selectedLanguage} is ${res.data.translations[0].translatedText}`
         })
       })
       .catch((err) => console.error('it\'s me! Not something else!', err))
@@ -152,6 +160,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
+  text: {
+    margin: 20,
+    fontSize: 16,
+    textAlign: 'center'
+  },
   preview: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -165,7 +178,23 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     color: '#000',
     padding: 10,
-    margin: 40
+    margin: 40,
+    fontSize: 20,
+  },
+  cancel: {
+      backgroundColor: 'rgba(192, 192, 192, 0.4)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      textAlign: 'center',
+      height: 60,
+      paddingTop: 15,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      elevation: 2,
+      position: 'relative',
+      fontSize: 20,
+      flex: 0,
   }
 });
 
