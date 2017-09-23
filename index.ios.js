@@ -26,7 +26,7 @@ export default class fireball extends Component {
     super(props);
     this.state = {
       path: null,
-      picString: ''
+      text: 'Loading...'
     };
     this.takePicture.bind(this)
     this.convertPictureToString.bind(this)
@@ -65,6 +65,7 @@ export default class fireball extends Component {
   renderImage() {
     return (
       <View>
+        <Text style={{margin: 60}} >{this.state.text}</Text>
         <Image
           source={{ uri: this.state.path }}
           style={styles.preview}
@@ -77,8 +78,6 @@ export default class fireball extends Component {
       </View>
     );
   }
-
-
 
 
   convertPictureToString(uri){
@@ -108,6 +107,9 @@ export default class fireball extends Component {
       .then(res => {
         // DO SOMETHING WITH RESPONSE
         console.log('res: ', res)
+        this.setState({
+          text: `We're ${res.data.responses[0].labelAnnotations[0].score}% sure that you captured: ${res.data.responses[0].labelAnnotations[0].description}!`
+        })
       })
       .catch((err) => console.error('it\'s me! Not something else!', err))
   }
