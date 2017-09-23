@@ -13,7 +13,8 @@ import {
   View,
   Image,
   NativeModules,
-  Picker
+  Picker,
+  TouchableHighlight
 } from 'react-native';
 import Camera from 'react-native-camera';
 import Axios from 'axios'
@@ -82,7 +83,12 @@ export default class fireball extends Component {
             aspect={Camera.constants.Aspect.fill}
             captureTarget={Camera.constants.CaptureTarget.disk}
             >
-            <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
+            <TouchableHighlight onPress={this.takePicture.bind(this)}>
+              <Image style={{maxHeight: 150, maxWidth: 150}} source={require('./fireball_icon.jpg')} />
+            </TouchableHighlight>
+            <TouchableHighlight onPress={() => this.setState({changeLang: true})}>
+              <Image style={{height: 25, width: 25, marginTop: 10, marginRight: 300}} source={require('./arrow.png')} />
+            </TouchableHighlight>
           </Camera>
         </View>
       </View>
@@ -93,11 +99,11 @@ export default class fireball extends Component {
     return (
       <View style={{backgroundColor: '#BBB'}}>
         <Header />
-        <Text style={styles.text} onPress={() => this.setState({changeLang: true})}>{this.state.text}</Text>
         <Image
           source={{ uri: this.state.path }}
           style={styles.preview}
         />
+        <Text style={styles.text} onPress={() => this.setState({changeLang: true})}>{this.state.text}</Text>
         <Text
           style={styles.cancel}
           onPress={() => this.setState({
@@ -209,8 +215,13 @@ const styles = StyleSheet.create({
   text: {
     paddingLeft: 80,
     paddingRight: 80,
+    paddingBottom: 5,
+    paddingTop: 5,
     fontSize: 16,
+    margin: 0,
     textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: 'rgb(249, 202, 107)'
   },
   preview: {
@@ -222,10 +233,10 @@ const styles = StyleSheet.create({
   },
   capture: {
     flex: 0,
-    backgroundColor: '#fff',
-    borderRadius: 5,
+    backgroundColor: 'rgb(249, 202, 107)',
+    borderRadius: 150,
     color: '#000',
-    padding: 10,
+    padding: 5,
     margin: 40,
     fontSize: 20,
   },
