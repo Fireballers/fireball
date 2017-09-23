@@ -38,7 +38,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This App lets the user take a camera picture</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This App stores photos taken in the camera roll</string>
 	<key>UIAppFonts</key>
@@ -64,6 +64,7 @@
 		<string>Rubik-Medium.ttf</string>
 		<string>Rubik-MediumItalic.ttf</string>
 		<string>Rubik-Regular.ttf</string>
+		<string>Feather.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
