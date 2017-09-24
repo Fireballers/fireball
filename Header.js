@@ -4,11 +4,13 @@ import { Text, View } from 'react-native';
 
 const styles = {
   viewStyle: {
-    backgroundColor: 'rgba(192, 192, 192, 0.4)',
+    backgroundColor: 'rgb(205, 205, 205)',
     justifyContent: 'center',
     alignItems: 'center',
     height: 60,
-    paddingTop: 15,
+    paddingTop: 30,
+    paddingBottom: 30,
+    margin: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
