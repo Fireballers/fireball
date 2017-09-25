@@ -3,7 +3,7 @@
  * https://github.com/facebook/react-native
  * @flow
  */
-import { cloudVision, translateApi, translateLang, selectedLanguage } from './secrets';
+import { cloudVision, translateApi, translateLang, selectedLanguage } from '../secrets';
 import React, { Component } from 'react';
 import {
   AppRegistry,
@@ -17,7 +17,7 @@ import {
 import Camera from 'react-native-camera';
 import Axios from 'axios'
 import RNFS from 'react-native-fs'
-import Header from './Header'
+import Header from './components/common/Header'
 import Tts from 'react-native-tts'
 
 class App extends Component {
