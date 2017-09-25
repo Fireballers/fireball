@@ -12,7 +12,8 @@ import {
   Dimensions,
   View,
   Image,
-  NativeModules
+  Picker,
+  TouchableHighlight
 } from 'react-native';
 import Camera from 'react-native-camera';
 import Axios from 'axios'
@@ -24,15 +25,34 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      changeLang: true,
       path: null,
       text: 'Loading...',
       score: null,
       description: null,
-      translatedText: null
+      translatedText: null,
+      selectedLanguage: 'Indonesian',
+      selectedLangCode: 'id'
     };
     this.takePicture.bind(this)
     this.convertPictureToString.bind(this)
     this.detectTheThing.bind(this)
+
+    this.codes = {
+      English: 'en',
+      French: 'fr',
+      German: 'de',
+      Hebrew: 'iw',
+      Indonesian: 'id',
+      Japanese: 'ja',
+      Korean: 'ko',
+      Polish: 'pl',
+      Russian: 'ru',
+      Spanish: 'es',
+      Swedish: 'sv',
+      Yiddish: 'yi'
+    };
+
   }
 
   takePicture() {
@@ -58,8 +78,13 @@ class App extends Component {
             style={styles.preview}
             aspect={Camera.constants.Aspect.fill}
             captureTarget={Camera.constants.CaptureTarget.disk}
-            >
-            <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
+          >
+            <TouchableHighlight onPress={this.takePicture.bind(this)}>
+              <Image style={{ maxHeight: 150, maxWidth: 150 }} source={require('./fireball_icon.jpg')} />
+            </TouchableHighlight>
+            <TouchableHighlight onPress={() => this.setState({ changeLang: true })}>
+              <Image style={{ height: 25, width: 25, marginTop: 10, marginRight: 300 }} source={require('./arrow.png')} />
+            </TouchableHighlight>
           </Camera>
         </View>
       </View>
@@ -68,66 +93,82 @@ class App extends Component {
 
   renderImage() {
     return (
-      <View>
+      <View style={{ backgroundColor: '#BBB' }}>
         <Header />
-        <Text style={styles.text} >{this.state.text}</Text>
         <Image
           source={{ uri: this.state.path }}
           style={styles.preview}
         />
+        <Text style={styles.text} onPress={() => this.setState({ changeLang: true })}>{this.state.text}</Text>
         <Text
           style={styles.cancel}
           onPress={() => this.setState({
-              path: null,
-              text: 'Loading...',
-              score: null,
-              description: null,
-              translatedText: null
+            path: null,
+            text: 'Loading...',
+            score: null,
+            description: null,
+            translatedText: null
           })}
         >Back to Camera</Text>
       </View>
     );
   }
 
-
-  convertPictureToString(uri){
-    console.log('does it even run convertpictostring?')
-    return RNFS.readFile( uri, 'base64' )
-    .then(res => res)
-    .catch(err => console.error(err))
+  renderPicker() {
+    return (
+      <View style={{ backgroundColor: 'black', padding: 100 }}>
+        <Header />
+        <Text style={{ fontSize: 17, color: '#fcad0f', textAlign: 'center' }}>Select Translation Language</Text>
+        <View style={{ backgroundColor: '#b7b1a5', margin: 50 }}>
+          <Picker
+            selectedValue={this.state.selectedLanguage}
+            onValueChange={(itemValue) => this.setState({ selectedLanguage: itemValue, selectedLangCode: this.codes[itemValue] })}>
+            {Object.keys(this.codes).map((lang, i) => {
+              return <Picker.Item key={i} label={lang} value={lang} />
+            })}
+          </Picker>
+          <Text style={styles.text} onPress={() => this.setState({ changeLang: false })}>Take Photo</Text>
+        </View>
+      </View>
+    )
   }
 
-  detectTheThing(base64Photo){
+  convertPictureToString(uri) {
+    console.log('does it even run convertpictostring?')
+    return RNFS.readFile(uri, 'base64')
+      .then(res => res)
+      .catch(err => console.error(err))
+  }
+
+  detectTheThing(base64Photo) {
     console.log('detect the thing', base64Photo)
 
     return Axios.post(cloudVision, {
-      "requests":[
+      "requests": [
         {
-          "image":{
+          "image": {
             "content": base64Photo
           },
-          "features":[
+          "features": [
             {
-              "type":"LABEL_DETECTION",
-              "maxResults":1
+              "type": "LABEL_DETECTION",
+              "maxResults": 1
             }
           ]
         }
       ]
     })
       .then(res => {
-        // DO SOMETHING WITH RESPONSE
         console.log('res: ', res)
         this.setState({
           score: Math.floor(res.data.responses[0].labelAnnotations[0].score * 100),
           description: res.data.responses[0].labelAnnotations[0].description,
-
         })
       })
       .then(() => {
         return Axios.post(translateApi, {
           "q": this.state.description,
-          "target": translateLang
+          "target": this.state.selectedLangCode
         })
       })
       .then(res => res.data)
@@ -135,7 +176,7 @@ class App extends Component {
         console.log(res.data.translations[0].translatedText)
         this.setState({
           translatedText: res.data.translations[0].translatedText,
-          text: `We're ${this.state.score}% sure that you captured: ${this.state.description}! Its translation to ${selectedLanguage} is ${res.data.translations[0].translatedText}`
+          text: `We're ${this.state.score}% sure that you captured: ${this.state.description}! Its translation to ${this.state.selectedLanguage} is ${res.data.translations[0].translatedText}`
         })
       })
       .then(() => {
@@ -152,7 +193,7 @@ class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {this.state.path ? this.renderImage() : this.renderCamera()}
+        {this.state.path ? this.renderImage() : (this.state.changeLang ? this.renderPicker() : this.renderCamera())}
       </View>
     )
   }
@@ -162,46 +203,55 @@ class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'black',
   },
   text: {
-    margin: 20,
+    paddingLeft: 80,
+    paddingRight: 80,
+    paddingBottom: 5,
+    paddingTop: 5,
     fontSize: 16,
-    textAlign: 'center'
+    margin: 0,
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgb(249, 202, 107)'
   },
   preview: {
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    height: (Dimensions.get('window').height)/2,
+    height: (Dimensions.get('window').height) / 2,
     width: Dimensions.get('window').width
   },
   capture: {
     flex: 0,
-    backgroundColor: '#fff',
-    borderRadius: 5,
+    backgroundColor: 'rgb(249, 202, 107)',
+    borderRadius: 150,
     color: '#000',
-    padding: 10,
+    padding: 5,
     margin: 40,
     fontSize: 20,
   },
   cancel: {
-      backgroundColor: 'rgba(192, 192, 192, 0.4)',
-      justifyContent: 'center',
-      alignItems: 'center',
-      textAlign: 'center',
-      height: 60,
-      paddingTop: 15,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      elevation: 2,
-      position: 'relative',
-      fontSize: 20,
-      flex: 0,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    height: 60,
+    paddingTop: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    elevation: 2,
+    position: 'relative',
+    fontSize: 20,
+    flex: 0,
   }
 });
+
 
 export default App;
