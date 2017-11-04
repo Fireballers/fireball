@@ -134,10 +134,6 @@ android {
 
 dependencies {
     compile project(':react-native-fs')
-    compile project(':react-native-image-to-base64')
-    compile project(':react-native-photo-view')
-    compile project(':react-native-share')
-    compile project(':react-native-linear-gradient')
     compile project(':react-native-vector-icons')
     compile project(':react-native-tts')
     compile project(':react-native-camera')
